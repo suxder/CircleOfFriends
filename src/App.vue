@@ -112,7 +112,7 @@ export default {
             },
             {
               url: 'https://img01.yzcdn.cn/vant/tree.jpg'
-            },
+            }
           ],
           hasVideo: false
         }
