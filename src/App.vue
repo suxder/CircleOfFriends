@@ -29,19 +29,31 @@
             >
               <div class="momentItem" v-for="item in list" :key="item.id" :title="item">
                   <div class="momentAvatar">
-                    <img src="" alt="动态作者头像">
+                    <img :src="item.authorAvatarUrl" alt="动态作者头像">
                   </div>
                   <div class="momentInfo">
                     <div class="authorName">
-                      <span>令狐冲</span>
+                      <span>{{ item.authorName }}</span>
                     </div>
                     <div class="momentText">
-                      <p>一些文案……</p>
+                      <p>{{ item.momentText }}</p>
                     </div>
                     <div class="momentPic" v-show="item.hasPic">
                       <van-uploader v-model="item.fileList" :deletable="false" :show-upload="false" />
                     </div>
                     <div class="momentVideo" v-show="item.hasVideo"></div>
+                    <div class="likeCommentsTool">
+                      <div class="toolBars">
+                        <div><span>发布时间</span></div>
+                        <div>点赞或评论</div>
+                      </div>
+                      <div class="commentsList">
+                        <van-cell-group inset>
+                          <van-cell  value="内容" />
+                          <van-cell  value="内容" />
+                        </van-cell-group>
+                      </div>
+                    </div>
                   </div>
               </div>
             </van-list>
@@ -76,7 +88,7 @@ export default {
         {
           id: 0,
           authorName: '令狐小传',
-          authorAvatarUrl: require('../src/assets/image/authorAvatars/author1.jpg'),
+          authorAvatarUrl: require('../src/assets/image/authorAvatars/author2.jpg'),
           momentText: '且将且将新火试新茶，诗酒趁年华。',
           hasPic: true,
           fileList: [
@@ -86,7 +98,21 @@ export default {
             },
             {
               url: 'https://img01.yzcdn.cn/vant/tree.jpg'
-            }
+            },
+            { url: 'https://img01.yzcdn.cn/vant/leaf.jpg' },
+            {
+              url: 'https://img01.yzcdn.cn/vant/sand.jpg'
+            },
+            {
+              url: 'https://img01.yzcdn.cn/vant/tree.jpg'
+            },
+            { url: 'https://img01.yzcdn.cn/vant/leaf.jpg' },
+            {
+              url: 'https://img01.yzcdn.cn/vant/sand.jpg'
+            },
+            {
+              url: 'https://img01.yzcdn.cn/vant/tree.jpg'
+            },
           ],
           hasVideo: false
         }
@@ -172,6 +198,7 @@ body {
 }
 
 .van-nav-bar__title {
+  font-weight: bold;
   color: #010101;
 }
 /**
@@ -212,6 +239,7 @@ main {
   align-self: flex-start;
   padding: 1em 0;
   color: #ffffff;
+  font-weight: bold;
 }
 
 .avatar img{
@@ -227,5 +255,42 @@ main {
   padding-top: 3rem;
   display: flex;
   justify-content: center;
+}
+
+.momentAvatar img{
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 0.2rem;
+}
+
+.momentItem {
+  display: flex;
+  justify-content: space-between;
+  width: 90vw;
+}
+
+.momentInfo {
+  width: 78vw;
+}
+
+.authorName span {
+  font-weight: bold;
+  color: #5b6b8f;
+}
+
+.momentText p {
+  margin-top: 0.2rem;
+  margin-bottom: 0.6rem;
+}
+
+.van-uploader__preview-image {
+  width: 23.5vw;
+  height: 23.5vw;
+}
+
+/* 点赞及工具栏样式 */
+.toolBars {
+  display: flex;
+  justify-content: space-between;
 }
 </style>
