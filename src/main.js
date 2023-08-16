@@ -3,7 +3,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import { NavBar, Icon, PullRefresh, List, Cell, Uploader, CellGroup } from 'vant'
+import { NavBar, Icon, PullRefresh, List, Cell, Uploader, CellGroup, Image as VanImage, ImagePreview, Popover, ActionSheet, Field, Button } from 'vant'
 import 'vant/lib/nav-bar/style'
 import 'vant/lib/icon/style'
 import 'vant/lib/pull-refresh/style'
@@ -11,6 +11,12 @@ import 'vant/lib/list/style'
 import 'vant/lib/cell/style'
 import 'vant/lib/uploader/style'
 import 'vant/lib/cell-group/style'
+import 'vant/lib/image/style'
+import 'vant/lib/image-preview/style'
+import 'vant/lib/popover/style'
+import 'vant/lib/action-sheet/style'
+import 'vant/lib/field/style'
+import 'vant/lib/Button/style'
 
 Vue.use(NavBar)
 Vue.use(Icon)
@@ -19,6 +25,12 @@ Vue.use(List)
 Vue.use(Cell)
 Vue.use(Uploader)
 Vue.use(CellGroup)
+Vue.use(VanImage)
+Vue.use(ImagePreview)
+Vue.use(Popover)
+Vue.use(ActionSheet)
+Vue.use(Field)
+Vue.use(Button)
 
 Vue.config.productionTip = false
 

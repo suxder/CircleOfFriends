@@ -38,20 +38,58 @@
                     <div class="momentText">
                       <p>{{ item.momentText }}</p>
                     </div>
-                    <div class="momentPic" v-show="item.hasPic">
+                    <div class="momentPic" v-show="item.hasPic" v-if="item.isMulti">
                       <van-uploader v-model="item.fileList" :deletable="false" :show-upload="false" />
+                    </div>
+                    <div class="momentPic" v-show="item.hasPic" v-else>
+                      <van-image
+                        width="50vw"
+                        :fit="item.fileList[0].imageFit"
+                        :src="item.fileList[0].url"
+                        @click="previewImg(item.fileList[0].url)"
+                      />
                     </div>
                     <div class="momentVideo" v-show="item.hasVideo"></div>
                     <div class="likeCommentsTool">
                       <div class="toolBars">
-                        <div><span>发布时间</span></div>
-                        <div>点赞或评论</div>
+                        <div class="momentTime"><span>3小时前</span></div>
+                        <div>
+                          <van-popover
+                            v-model="item.showPopover"
+                            trigger="click"
+                            placement="left"
+                          >
+                            <div class="popCard">
+                              <ul>
+                                <li>
+                                  <van-icon name="like-o" @click="handleLikeBtn($event,item.likeIt, item.id)" />
+                                  <span>赞</span>
+                                </li>
+                                <li @click="handleCommentBtn(item.id)">
+                                  <van-icon name="more-o" />
+                                  <span>评论</span>
+                                </li>
+                              </ul>
+                            </div>
+                            <template #reference>
+                              <van-icon name="ellipsis" />
+                            </template>
+                          </van-popover>
+                        </div>
                       </div>
-                      <div class="commentsList">
-                        <van-cell-group inset>
-                          <van-cell  value="内容" />
-                          <van-cell  value="内容" />
-                        </van-cell-group>
+                      <div class="likeList" v-show="item.likeList.length > 0">
+                        <van-icon name="like-o"  />
+                        <ul>
+                          <li v-for="likeItem in item.likeList" :key="likeItem.id" :title="likeItem">
+                            <img :src="likeItem" alt="点赞人头像">
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="commentsList" v-show="item.commentList.length > 0">
+                        <div class="commentItem" v-for="commentItem in item.commentList" :key="commentItem.id" :title="commentItem">
+                          <span>{{ commentItem.name }}</span>
+                          : {{ commentItem.commentText }}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -60,11 +98,18 @@
           </div>
         </van-pull-refresh>
       </main>
+      <van-action-sheet v-model="showInputSheet" :round="false" :overlay="false">
+        <van-field v-model="commentText" placeholder="评论"  />
+        <van-icon name="smile-o" />
+        <van-button type="default"  @click="sendComment()">发送</van-button>
+      </van-action-sheet>
     </div>
   </div>
 </template>
 
 <script>
+import {ImagePreview} from 'vant'
+
 export default {
   name: 'App',
   data () {
@@ -91,6 +136,7 @@ export default {
           authorAvatarUrl: require('../src/assets/image/authorAvatars/author2.jpg'),
           momentText: '且将且将新火试新茶，诗酒趁年华。',
           hasPic: true,
+          isMulti: true,
           fileList: [
             { url: 'https://img01.yzcdn.cn/vant/leaf.jpg' },
             {
@@ -114,11 +160,46 @@ export default {
               url: 'https://img01.yzcdn.cn/vant/tree.jpg'
             }
           ],
-          hasVideo: false
+          hasVideo: false,
+          showPopover: false,
+          likeIt: false,
+          likeList: [],
+          commentList: []
+        },
+        {
+          id: 1,
+          authorName: '周思成',
+          authorAvatarUrl: require('../src/assets/image/authorAvatars/author3.png'),
+          momentText: '出门看公园.....',
+          hasPic: true,
+          isMulti: false,
+          fileList: [
+            {
+              url: 'https://img01.yzcdn.cn/vant/tree.jpg',
+              imageFit: 'contain'
+            }
+          ],
+          hasVideo: false,
+          showPopover: false,
+          likeList: [],
+          commentList: []
         }
       ],
       loading: false,
-      finished: false
+      finished: false,
+      // 点赞评论
+      actions: [{ text: '选项一' }, { text: '选项二' }, { text: '选项三' }],
+      // 输入评论的文本框
+      showInputSheet: false,
+      // 输入评论的内容
+      commentText: '',
+      // 记录评论所属的动态ID
+      commentID: 0
+    }
+  },
+  computed: {
+    hasLike: function (likeList) {
+      return likeList > 0
     }
   },
   methods: {
@@ -133,22 +214,60 @@ export default {
     /**
      *  动态列表
      */
+    //  列表数据更新
     onLoad () {
       // 异步更新数据
       // setTimeout 仅做示例，真实场景中一般为 ajax 请求
       setTimeout(() => {
-        for (let i = 0; i < 10; i++) {
-          this.list.push(this.list.length + 1)
-        }
-
         // 加载状态结束
         this.loading = false
 
         // 数据全部加载完成
-        if (this.list.length >= 20) {
-          this.finished = true
-        }
+        this.finished = true
       }, 1000)
+    },
+    //  点击单张图片预览
+    previewImg (url) {
+      ImagePreview([url])
+    },
+    //  点赞按钮回调函数
+    handleLikeBtn (e, likeIt, id) {
+      if (likeIt) {
+        console.log(e.target)
+        e.target.classList.remove('van-icon-like')
+        e.target.classList.add('van-icon-like-o')
+        e.target.classList.remove('likeIconColor')
+        e.target.classList.add('unlikeIconColor')
+        e.target.parentNode.children[1].innerText = '赞'
+        this.list[id].likeIt = false
+        this.list[id].likeList.shift()
+        this.list[id].showPopover = false
+      } else {
+        console.log(e.target)
+        e.target.classList.remove('van-icon-like-o')
+        e.target.classList.add('van-icon-like')
+        e.target.classList.remove('unlikeIconColor')
+        e.target.classList.add('likeIconColor')
+        e.target.parentNode.children[1].innerText = '取消'
+        this.list[id].likeIt = true
+        this.list[id].likeList.push(require('../src/assets/image/avatar.jpg'))
+        this.list[id].showPopover = false
+      }
+    },
+    //  评论按钮回调函数
+    handleCommentBtn (id) {
+      this.list[id].showPopover = false
+      this.showInputSheet = true
+      this.commentID = id
+    },
+    //  发送评论
+    sendComment () {
+      this.list[this.commentID].commentList.push({
+        name: this.userProfile.username,
+        commentText: this.commentText
+      })
+      this.showInputSheet = false
+      this.commentText = ''
     }
   }
 }
@@ -168,8 +287,8 @@ export default {
 
 body {
   font-size: 1rem;
-  width: 100vw;
-  height: 100vh;
+  /*width: 100vw;*/
+  /*height: 100vh;*/
   margin: 0;
 }
 
@@ -208,10 +327,11 @@ body {
 /* 下拉刷新样式 */
 main {
   background-color: #2e2e2e;
+  min-height: 100vh;
 }
 
 .van-pull-refresh {
-  height: 100rem;
+  height: 100%;
 }
 
 .bgImage {
@@ -255,6 +375,7 @@ main {
   padding-top: 3rem;
   display: flex;
   justify-content: center;
+  overflow: visible;
 }
 
 .momentAvatar img{
@@ -267,6 +388,8 @@ main {
   display: flex;
   justify-content: space-between;
   width: 90vw;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #e8e8e8;
 }
 
 .momentInfo {
@@ -292,5 +415,104 @@ main {
 .toolBars {
   display: flex;
   justify-content: space-between;
+}
+
+.toolBars .van-icon {
+  display: block;
+  background-color: #f8f8f8;
+  height: 2.5vh;
+  width: 8vw;
+  font-size: 1.5rem;
+  color: #626ca7;
+  border-radius: 0.2rem;
+  text-align: center;
+}
+
+.momentTime {
+  color: #717171;
+  font-size: 0.5rem;
+}
+
+.popCard ul {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 40vw;
+  height: 4vh;
+  background-color: #4c4c4c;
+}
+
+.popCard ul li {
+  color: #fbfbfb;
+  font-size: 0.9rem;
+}
+
+.likeList {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  background-color: #f8f8f8;
+  padding: 0.3rem 0.1rem;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.likeList ul {
+  min-width: 70vw;
+}
+
+.likeList ul li {
+  display: flex;
+  align-items: center;
+}
+
+.likeList ul li img {
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 0.2rem;
+}
+
+.likeIconColor {
+  color: red;
+}
+
+.unlikeIconColor {
+  color: #f8f8f8;
+}
+
+.commentItem {
+  font-size: 0.8rem;
+  background-color: #f8f8f8;
+  padding: 0.3rem 0.4rem;
+}
+
+.commentItem span {
+  color: #5b6b8f;
+  font-weight: bold;
+}
+
+.van-action-sheet__content {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  background-color: #f7f7f7;
+  height: 5vh;
+}
+
+.van-cell {
+  width: 70%;
+  padding: 3px 8px;
+}
+
+.van-icon-smile-o {
+  font-size: 1.7rem;
+}
+
+.van-button--normal {
+  height: 70%;
+  padding: 0 12px;
+  background-color: #f7f7f7;
+  border: 1px solid #c8c8c8;
+  border-radius: 0.2rem;
+  color: #c4c4c4;
 }
 </style>
