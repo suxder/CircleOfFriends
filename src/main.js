@@ -3,6 +3,8 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+// 引入阿里巴巴字体图标文件
+import './assets/iconfont/iconfont.css'
 import { NavBar, Icon, PullRefresh, List, Cell, Uploader, CellGroup, Image as VanImage, ImagePreview, Popover, ActionSheet, Field, Button } from 'vant'
 import 'vant/lib/nav-bar/style'
 import 'vant/lib/icon/style'

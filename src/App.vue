@@ -6,7 +6,7 @@
           <ul>
             <li>
               <span class="left-icon">
-                左箭头
+                <i class="iconfont icon-left"></i>
               </span>
             </li>
             <li>
@@ -16,14 +16,20 @@
             </li>
             <li>
               <span class="right-icon">
-                摄影icon
+                <i class="iconfont icon-zhaoxiangji1"></i>
               </span>
             </li>
           </ul>
         </div>
       </header>
       <main>
-        <van-pull-refresh v-model="isLoading" :head-height="80" @refresh="onRefresh">
+        <div class="scroll-container"
+          @touchstart.stop="handlerTouchStart"
+          @touchmove.stop="handlerTouchMove"
+          @touchend.stop="handlerTouchEnd"
+          ref="scrollContainer"
+          :class="{'transition': isTransition}"
+        >
           <div class="bgImage" :style="userProfile.bgImageUrl">
             <div class="userProfile">
               <div class="userName">
@@ -35,12 +41,7 @@
             </div>
           </div>
           <div class="momentList">
-            <van-list
-              v-model="loading"
-              :finished="finished"
-              finished-text="没有更多了"
-              @load="onLoad"
-            >
+            <div class="momentListContainer">
               <div class="momentItem" v-for="item in list" :key="item.id" :title="item">
                   <div class="momentAvatar">
                     <img :src="item.authorAvatarUrl" alt="动态作者头像">
@@ -53,15 +54,9 @@
                       <p>{{ item.momentText }}</p>
                     </div>
                     <div class="momentPic" v-show="item.hasPic" v-if="item.isMulti">
-                      <van-uploader v-model="item.fileList" :deletable="false" :show-upload="false" />
+                      <div class="momentPicContainer"/>
                     </div>
                     <div class="momentPic" v-show="item.hasPic" v-else>
-                      <van-image
-                        width="50vw"
-                        :fit="item.fileList[0].imageFit"
-                        :src="item.fileList[0].url"
-                        @click="previewImg(item.fileList[0].url)"
-                      />
                     </div>
                     <div class="momentVideo" v-show="item.hasVideo"></div>
                     <div class="likeCommentsTool">
@@ -108,9 +103,9 @@
                     </div>
                   </div>
               </div>
-            </van-list>
+            </div>
           </div>
-        </van-pull-refresh>
+        </div>
       </main>
       <van-action-sheet v-model="showInputSheet" :round="false" :overlay="false">
         <van-field v-model="commentText" placeholder="评论"  />
@@ -129,9 +124,16 @@ export default {
   data () {
     return {
       /**
-       *  下拉刷新
+       *  下拉刷新（实现拖曳效果）
        */
-      isLoading: false,
+      // 记录鼠标点击的位置
+      startLocation: '',
+      // 记录移动的位置
+      moveDistance: 0,
+      // 记录移动的距离
+      distance: '',
+      // 是否启动transition
+      isTransition: false,
       /**
        *  用户数据
        */
@@ -211,19 +213,31 @@ export default {
       commentID: 0
     }
   },
-  computed: {
-    hasLike: function (likeList) {
-      return likeList > 0
-    }
-  },
+  computed: {},
   methods: {
     /**
      *  下拉刷新
      */
-    onRefresh () {
-      setTimeout(() => {
-        this.isLoading = false
-      }, 100)
+    // 获取手指触屏时的屏幕Y轴位置
+    handlerTouchStart (e) {
+      this.startLocation = e.touches[0].pageY
+      this.isTransition = false
+    },
+    // 获取手指移动的距离
+    handlerTouchMove (e) {
+      // 通过系数来控制下拉的松紧度（映射倍数）
+      let moveSpeed = 0.4
+
+      this.moveDistance = Math.floor(e.touches[0].pageY - this.startLocation)
+      this.$refs.scrollContainer.style.transform = `translateY(${this.moveDistance * moveSpeed}px)`
+    },
+    // 获取手指松开的Y轴位置
+    handlerTouchEnd (e) {
+      // 清除已移动的距离
+      this.moveDistance = 0
+      this.isTransition = true
+      // 恢复原位
+      this.$refs.scrollContainer.style.transform = `translateY(0px)`
     },
     /**
      *  动态列表
@@ -301,8 +315,6 @@ export default {
 
 body {
   font-size: 1rem;
-  /*width: 100vw;*/
-  /*height: 100vh;*/
   margin: 0;
 }
 
@@ -321,19 +333,6 @@ body {
 /**
   header基础样式
  */
-.van-nav-bar {
-  /*下拉后header的背景样式*/
-  background-color: #ededed;
-}
-
-.van-nav-bar .van-icon {
-  color: #252525;
-}
-
-.van-nav-bar__title {
-  font-weight: bold;
-  color: #010101;
-}
 header {
   position: fixed;
   z-index: 999;
@@ -344,6 +343,7 @@ header {
   width: 100%;
   height: 6vh;
   background-color: #ededed;
+  padding: 0 0.8rem;
 }
 
 .headContainer ul {
@@ -366,6 +366,16 @@ header {
   font-weight: bold;
   color: #010101;
 }
+
+.left-icon i {
+  font-size: 1rem;
+  color: #252525;
+}
+
+.right-icon i {
+  font-size: 1.3rem;
+  color: #252525;
+}
 /**
   主体样式
  */
@@ -376,8 +386,12 @@ main {
   min-height: 100vh;
 }
 
-.van-pull-refresh {
+.scroll-container {
   height: 100%;
+}
+
+.transition {
+  transition: all 0.7s;
 }
 
 .bgImage {
@@ -417,6 +431,7 @@ main {
   动态列表样式
  */
 .momentList {
+  width: 100%;
   background-color: #ffffff;
   padding-top: 3rem;
   display: flex;
@@ -450,6 +465,9 @@ main {
 .momentText p {
   margin-top: 0.2rem;
   margin-bottom: 0.6rem;
+}
+
+.momentPic {
 }
 
 .van-uploader__preview-image {
