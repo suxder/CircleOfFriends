@@ -2,11 +2,25 @@
   <div id="app">
     <div class="container">
       <header>
-        <van-nav-bar title="朋友圈"  :border="false" :fixed="true" left-arrow>
-          <template #right>
-            <van-icon name="photograph" size="18" />
-          </template>
-        </van-nav-bar>
+        <div class="headContainer">
+          <ul>
+            <li>
+              <span class="left-icon">
+                左箭头
+              </span>
+            </li>
+            <li>
+              <span class="app-title">
+                朋友圈
+              </span>
+            </li>
+            <li>
+              <span class="right-icon">
+                摄影icon
+              </span>
+            </li>
+          </ul>
+        </div>
       </header>
       <main>
         <van-pull-refresh v-model="isLoading" :head-height="80" @refresh="onRefresh">
@@ -317,6 +331,38 @@ body {
 }
 
 .van-nav-bar__title {
+  font-weight: bold;
+  color: #010101;
+}
+header {
+  position: fixed;
+  z-index: 999;
+  width: 100%;
+}
+
+.headContainer {
+  width: 100%;
+  height: 6vh;
+  background-color: #ededed;
+}
+
+.headContainer ul {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+}
+
+.headContainer ul li {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+}
+
+.app-title {
   font-weight: bold;
   color: #010101;
 }
