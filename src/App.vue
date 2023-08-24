@@ -16,13 +16,15 @@
             </li>
             <li>
               <span class="right-icon">
-                <i class="iconfont icon-zhaoxiangji1"></i>
+                <i class="iconfont icon-zhaoxiangji"></i>
               </span>
             </li>
           </ul>
         </div>
       </header>
       <main>
+        <div class="refreshTip" v-show="isOnRefresh" ref="refreshTip">
+        </div>
         <div class="scroll-container"
           @touchstart.stop="handlerTouchStart"
           @touchmove.stop="handlerTouchMove"
@@ -134,6 +136,8 @@ export default {
       distance: '',
       // 是否启动transition
       isTransition: false,
+      // 记录是否开始刷新
+      isOnRefresh: false,
       /**
        *  用户数据
        */
@@ -220,6 +224,7 @@ export default {
      */
     // 获取手指触屏时的屏幕Y轴位置
     handlerTouchStart (e) {
+      this.isOnRefresh = true
       this.startLocation = e.touches[0].pageY
       this.isTransition = false
     },
@@ -227,9 +232,13 @@ export default {
     handlerTouchMove (e) {
       // 通过系数来控制下拉的松紧度（映射倍数）
       let moveSpeed = 0.4
+      // 通过系数来控制旋转的快慢
+      let rotateSpeed = 2
 
       this.moveDistance = Math.floor(e.touches[0].pageY - this.startLocation)
       this.$refs.scrollContainer.style.transform = `translateY(${this.moveDistance * moveSpeed}px)`
+      this.$refs.refreshTip.style.transform = `rotate(-${this.moveDistance * rotateSpeed}deg)`
+      this.$refs.refreshTip.style.top = `3rem`
     },
     // 获取手指松开的Y轴位置
     handlerTouchEnd (e) {
@@ -238,6 +247,8 @@ export default {
       this.isTransition = true
       // 恢复原位
       this.$refs.scrollContainer.style.transform = `translateY(0px)`
+      this.$refs.refreshTip.style.transform = `rotate(10000deg)`
+      this.$refs.refreshTip.style.top = `-3.5rem`
     },
     /**
      *  动态列表
@@ -342,7 +353,7 @@ header {
 .headContainer {
   width: 100%;
   height: 6vh;
-  background-color: #ededed;
+  background-color:rgba(0,0,0,0);
   padding: 0 0.8rem;
 }
 
@@ -365,16 +376,17 @@ header {
 .app-title {
   font-weight: bold;
   color: #010101;
+  visibility: hidden;
 }
 
 .left-icon i {
   font-size: 1rem;
-  color: #252525;
+  color: #fff;
 }
 
 .right-icon i {
   font-size: 1.3rem;
-  color: #252525;
+  color: #fff;
 }
 /**
   主体样式
@@ -388,10 +400,29 @@ main {
 
 .scroll-container {
   height: 100%;
+  position: relative;
 }
 
 .transition {
   transition: all 0.7s;
+}
+
+.refreshTip {
+  position: fixed;
+  z-index: 999;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  left: 2rem;
+  top: -3.5rem;
+  background-image: url('./assets/image/refreshTip.png');
+  background-position: center;
+  background-size: cover;
+  transition: 0.1s top linear, 0.1s transform linear;
+}
+
+.refreshTip span {
+  text-align: center;
 }
 
 .bgImage {
