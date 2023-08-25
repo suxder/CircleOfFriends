@@ -6,17 +6,17 @@
           <ul>
             <li>
               <span class="left-icon">
-                <i class="iconfont icon-left"></i>
+                <i ref="leftIcon" class="iconfont icon-left"></i>
               </span>
             </li>
             <li>
-              <span class="app-title">
+              <span ref="appTitle" class="app-title">
                 朋友圈
               </span>
             </li>
             <li>
               <span class="right-icon">
-                <i class="iconfont icon-zhaoxiangji"></i>
+                <i ref="rightIcon" class="iconfont icon-zhaoxiangji"></i>
               </span>
             </li>
           </ul>
@@ -334,9 +334,21 @@ export default {
       // 浏览器窗口的高度
       let getWindowHeight = document.documentElement.clientHeight || document.body.clientHeight
       if (scrollTop > 300) {
-        // 改变header透明度
-        this.$refs.headerRef.style.backgroundColor = `rgba(0,0,0,0)`
+        this.$refs.headerRef.style.backgroundColor = `rgba(237, 237, 237,1)`
+        // 改变字体颜色
+        this.$refs.leftIcon.style.color = `#010101`
+        this.$refs.rightIcon.style.color = `#010101`
+        this.$refs.appTitle.style.visibility = `visible`
       } else {
+        // 数据归一
+        let transparency = scrollTop / 300
+
+        // 改变header透明度
+        this.$refs.headerRef.style.backgroundColor = `rgba(237, 237, 237,${transparency})`
+        // 改变字体颜色
+        this.$refs.leftIcon.style.color = `#fff`
+        this.$refs.rightIcon.style.color = `#fff`
+        this.$refs.appTitle.style.visibility = `hidden`
       }
 
       // 滚动条距离页面顶部的距离大于一屏时触发该方法
@@ -454,7 +466,6 @@ header {
   height: 6vh;
   background-color:rgba(0,0,0,0);
   padding: 0 0.8rem;
-  transition: 1s background-color linear;
 }
 
 .headContainer ul {
