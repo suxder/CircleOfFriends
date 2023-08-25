@@ -34,6 +34,13 @@
       "unicode_decimal": 58939
     },
     {
+      "icon_id": "4735338",
+      "name": "icon_笑脸-线",
+      "font_class": "icon_xiaolian-xian",
+      "unicode": "e650",
+      "unicode_decimal": 58960
+    },
+    {
       "icon_id": "6775644",
       "name": "爱心",
       "font_class": "aixin",
@@ -46,6 +53,13 @@
       "font_class": "pinglun",
       "unicode": "e602",
       "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "21169217",
+      "name": "ellipsis",
+      "font_class": "ellipsis",
+      "unicode": "e58a",
+      "unicode_decimal": 58762
     }
   ]
 }

@@ -1,8 +1,8 @@
 <template>
-  <div id="app">
-    <div class="container">
+  <div id="app" >
+    <div class="container" >
       <header>
-        <div class="headContainer">
+        <div class="headContainer" ref="headerRef">
           <ul>
             <li>
               <span class="left-icon">
@@ -22,7 +22,7 @@
           </ul>
         </div>
       </header>
-      <main>
+      <main >
         <div class="refreshTip" v-show="isOnRefresh" ref="refreshTip">
         </div>
         <div class="scroll-container"
@@ -55,37 +55,45 @@
                     <div class="momentText">
                       <p>{{ item.momentText }}</p>
                     </div>
-                    <div class="momentPic" v-show="item.hasPic" v-if="item.isMulti">
-                      <div class="momentPicContainer"/>
+                    <div class="momentPicOfOne" v-show="item.fileList.length === 1" >
+                      <div class="momentPicContainer">
+                        <!--后续数据结构改变后，重新设置key值-->
+                        <img v-for="pic in item.fileList" :key="pic.id" :src="pic.url" alt="朋友圈配图">
+                      </div>
                     </div>
-                    <div class="momentPic" v-show="item.hasPic" v-else>
+                    <div class="momentPicOfFour" v-show="item.fileList.length === 4">
+                      <div class="momentPicContainer">
+                        <img v-for="pic in item.fileList" :key="pic.id" :src="pic.url" alt="朋友圈配图">
+                      </div>
                     </div>
-                    <div class="momentVideo" v-show="item.hasVideo"></div>
+                    <div class="momentPicOfMulti" v-show="item.fileList.length !== 4 && item.fileList.length !== 1">
+                      <div class="momentPicContainer">
+                        <img v-for="pic in item.fileList" :key="pic.id" :src="pic.url" alt="朋友圈配图">
+                      </div>
+                    </div>
                     <div class="likeCommentsTool">
                       <div class="toolBars">
                         <div class="momentTime"><span>3小时前</span></div>
                         <div>
-                          <van-popover
-                            v-model="item.showPopover"
-                            trigger="click"
-                            placement="left"
-                          >
-                            <div class="popCard">
-                              <ul>
-                                <li>
-                                  <van-icon name="like-o" @click="handleLikeBtn($event,item.likeIt, item.id)" />
-                                  <span>赞</span>
-                                </li>
-                                <li @click="handleCommentBtn(item.id)">
-                                  <van-icon name="more-o" />
-                                  <span>评论</span>
-                                </li>
-                              </ul>
+                          <div class="ellipsisDiv" @click="handlerEllipseClick(item.id)">
+                            <i class="iconfont icon-ellipsis"></i>
+                            <div class="popDiv"
+                                 v-show="item.showPopover"
+                            >
+                              <div class="popCard">
+                                <ul>
+                                  <li>
+                                    <i class="iconfont icon-aixin" @click="handleLikeBtn($event,item.likeIt, item.id)" />
+                                    <span>赞</span>
+                                  </li>
+                                  <li @click="handleCommentBtn(item.id)">
+                                    <i class="iconfont icon-pinglun " />
+                                    <span>评论</span>
+                                  </li>
+                                </ul>
+                              </div>
                             </div>
-                            <template #reference>
-                              <van-icon name="ellipsis" />
-                            </template>
-                          </van-popover>
+                          </div>
                         </div>
                       </div>
                       <div class="likeList" v-show="item.likeList.length > 0">
@@ -98,8 +106,10 @@
                       </div>
                       <div class="commentsList" v-show="item.commentList.length > 0">
                         <div class="commentItem" v-for="commentItem in item.commentList" :key="commentItem.id" :title="commentItem">
-                          <span>{{ commentItem.name }}</span>
-                          : {{ commentItem.commentText }}
+                          <p>
+                            <span>{{ commentItem.name }}</span>
+                            : {{ commentItem.commentText }}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -108,19 +118,17 @@
             </div>
           </div>
         </div>
+        <div class="actionSheet" v-show="showInputSheet">
+          <input class="commentInput" v-model="commentText" placeholder="评论"  />
+          <i class="iconfont icon-icon_xiaolian-xian" />
+          <button   class="commentInputBtn" @click="sendComment()">发送</button>
+        </div>
       </main>
-      <van-action-sheet v-model="showInputSheet" :round="false" :overlay="false">
-        <van-field v-model="commentText" placeholder="评论"  />
-        <van-icon name="smile-o" />
-        <van-button type="default"  @click="sendComment()">发送</van-button>
-      </van-action-sheet>
     </div>
   </div>
 </template>
 
 <script>
-import {ImagePreview} from 'vant'
-
 export default {
   name: 'App',
   data () {
@@ -155,33 +163,46 @@ export default {
           authorName: '令狐小传',
           authorAvatarUrl: require('../src/assets/image/authorAvatars/author2.jpg'),
           momentText: '且将且将新火试新茶，诗酒趁年华。',
-          hasPic: true,
-          isMulti: true,
           fileList: [
-            { url: 'https://img01.yzcdn.cn/vant/leaf.jpg' },
             {
+              id: 0,
+              url: 'https://img01.yzcdn.cn/vant/leaf.jpg'
+            },
+            {
+              id: 1,
               url: 'https://img01.yzcdn.cn/vant/sand.jpg'
             },
             {
+              id: 2,
               url: 'https://img01.yzcdn.cn/vant/tree.jpg'
             },
-            { url: 'https://img01.yzcdn.cn/vant/leaf.jpg' },
             {
+              id: 3,
+              url: 'https://img01.yzcdn.cn/vant/leaf.jpg'
+            },
+            {
+              id: 4,
               url: 'https://img01.yzcdn.cn/vant/sand.jpg'
             },
             {
+              id: 5,
               url: 'https://img01.yzcdn.cn/vant/tree.jpg'
             },
-            { url: 'https://img01.yzcdn.cn/vant/leaf.jpg' },
             {
+              id: 6,
+              url: 'https://img01.yzcdn.cn/vant/leaf.jpg'
+            },
+            {
+              id: 7,
               url: 'https://img01.yzcdn.cn/vant/sand.jpg'
             },
             {
+              id: 8,
               url: 'https://img01.yzcdn.cn/vant/tree.jpg'
             }
           ],
-          hasVideo: false,
           showPopover: false,
+          hasVideo: false,
           likeIt: false,
           likeList: [],
           commentList: []
@@ -191,16 +212,68 @@ export default {
           authorName: '周思成',
           authorAvatarUrl: require('../src/assets/image/authorAvatars/author3.png'),
           momentText: '出门看公园.....',
-          hasPic: true,
-          isMulti: false,
           fileList: [
             {
-              url: 'https://img01.yzcdn.cn/vant/tree.jpg',
-              imageFit: 'contain'
+              id: 0,
+              url: 'https://img01.yzcdn.cn/vant/sand.jpg'
+            },
+            {
+              id: 1,
+              url: 'https://img01.yzcdn.cn/vant/sand.jpg'
+            },
+            {
+              id: 2,
+              url: 'https://img01.yzcdn.cn/vant/sand.jpg'
             }
           ],
-          hasVideo: false,
           showPopover: false,
+          hasVideo: false,
+          likeIt: false,
+          likeList: [],
+          commentList: []
+        },
+        {
+          id: 2,
+          authorName: '刘家豪',
+          authorAvatarUrl: require('../src/assets/image/authorAvatars/author4.jpg'),
+          momentText: '这树真好看.....',
+          fileList: [
+            {
+              id: 0,
+              url: 'https://img01.yzcdn.cn/vant/tree.jpg'
+            },
+            {
+              id: 1,
+              url: 'https://img01.yzcdn.cn/vant/tree.jpg'
+            },
+            {
+              id: 2,
+              url: 'https://img01.yzcdn.cn/vant/tree.jpg'
+            },
+            {
+              id: 3,
+              url: 'https://img01.yzcdn.cn/vant/tree.jpg'
+            }
+          ],
+          showPopover: false,
+          hasVideo: false,
+          likeIt: false,
+          likeList: [],
+          commentList: []
+        },
+        {
+          id: 3,
+          authorName: '黄旭祥',
+          authorAvatarUrl: require('../src/assets/image/authorAvatars/author1.jpg'),
+          momentText: '好久没出门了',
+          fileList: [
+            {
+              url: 'https://img01.yzcdn.cn/vant/tree.jpg'
+            }
+          ],
+          showPopover: false,
+          hasVideo: false,
+          likeIt: false,
           likeList: [],
           commentList: []
         }
@@ -251,46 +324,64 @@ export default {
       this.$refs.refreshTip.style.top = `-3.5rem`
     },
     /**
+     *  监听滚动事件，超出设定值后，header透明度减弱
+     */
+    handleScroll () {
+      // 滚动条在y轴上的滚动距离
+      let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
+      // 文档的总高度
+      let documentScrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight
+      // 浏览器窗口的高度
+      let getWindowHeight = document.documentElement.clientHeight || document.body.clientHeight
+      if (scrollTop > 300) {
+        // 改变header透明度
+        this.$refs.headerRef.style.backgroundColor = `rgba(0,0,0,0)`
+      } else {
+      }
+
+      // 滚动条距离页面顶部的距离大于一屏时触发该方法
+
+      if (scrollTop + getWindowHeight === documentScrollHeight) {
+        console.log('监听成功')
+      }
+    },
+    /**
      *  动态列表
      */
-    //  列表数据更新
-    onLoad () {
-      // 异步更新数据
-      // setTimeout 仅做示例，真实场景中一般为 ajax 请求
-      setTimeout(() => {
-        // 加载状态结束
-        this.loading = false
-
-        // 数据全部加载完成
-        this.finished = true
-      }, 1000)
-    },
-    //  点击单张图片预览
-    previewImg (url) {
-      ImagePreview([url])
+    // 侦听ellipseDiv点击事件
+    handlerEllipseClick (id) {
+      this.list[id].showPopover = true
     },
     //  点赞按钮回调函数
     handleLikeBtn (e, likeIt, id) {
       if (likeIt) {
         console.log(e.target)
-        e.target.classList.remove('van-icon-like')
-        e.target.classList.add('van-icon-like-o')
+        e.target.classList.remove('icon-xiai')
+        e.target.classList.add('icon-aixin')
         e.target.classList.remove('likeIconColor')
         e.target.classList.add('unlikeIconColor')
         e.target.parentNode.children[1].innerText = '赞'
         this.list[id].likeIt = false
         this.list[id].likeList.shift()
-        this.list[id].showPopover = false
+        // 定时关闭popCard
+        let listData = this.list
+        setTimeout(function () {
+          listData[id].showPopover = false
+        }, 300)
       } else {
-        console.log(e.target)
-        e.target.classList.remove('van-icon-like-o')
-        e.target.classList.add('van-icon-like')
+        let data = require('../src/assets/image/avatar.jpg')
+        e.target.classList.remove('icon-aixin')
+        e.target.classList.add('icon-xiai')
         e.target.classList.remove('unlikeIconColor')
         e.target.classList.add('likeIconColor')
         e.target.parentNode.children[1].innerText = '取消'
         this.list[id].likeIt = true
-        this.list[id].likeList.push(require('../src/assets/image/avatar.jpg'))
-        this.list[id].showPopover = false
+        this.list[id].likeList.push(data)
+        // 定时关闭popCard
+        let listData = this.list
+        setTimeout(function () {
+          listData[id].showPopover = false
+        }, 300)
       }
     },
     //  评论按钮回调函数
@@ -298,16 +389,26 @@ export default {
       this.list[id].showPopover = false
       this.showInputSheet = true
       this.commentID = id
+      // 定时关闭popCard
+      let listData = this.list
+      setTimeout(function () {
+        listData[id].showPopover = false
+      }, 300)
     },
     //  发送评论
     sendComment () {
-      this.list[this.commentID].commentList.push({
+      // 组织数据
+      let itemComment = {
         name: this.userProfile.username,
         commentText: this.commentText
-      })
+      }
+      this.list[this.commentID].commentList.push(itemComment)
       this.showInputSheet = false
       this.commentText = ''
     }
+  },
+  mounted () {
+    window.addEventListener('scroll', this.handleScroll)
   }
 }
 </script>
@@ -333,8 +434,7 @@ body {
   font-family: "Microsoft Yahei";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  min-height: 100%;
-  height: 100%;
+  height: 100vh;
   width: 100%;
   padding: 0;
   margin: 0;
@@ -351,10 +451,10 @@ header {
 }
 
 .headContainer {
-  width: 100%;
   height: 6vh;
   background-color:rgba(0,0,0,0);
   padding: 0 0.8rem;
+  transition: 1s background-color linear;
 }
 
 .headContainer ul {
@@ -395,12 +495,6 @@ header {
 /* 下拉刷新样式 */
 main {
   background-color: #2e2e2e;
-  min-height: 100vh;
-}
-
-.scroll-container {
-  height: 100%;
-  position: relative;
 }
 
 .transition {
@@ -431,7 +525,7 @@ main {
   background-image: url('assets/image/bgImage.jpg');
   background-size: cover;
   background-position: center;
-  width: 100vw;
+  width: 100%;
   height: 36vh;
 }
 
@@ -498,12 +592,33 @@ main {
   margin-bottom: 0.6rem;
 }
 
-.momentPic {
+/* 配图样式 */
+.momentPicContainer {
+  display: flex;
+  flex-wrap: wrap;
 }
 
-.van-uploader__preview-image {
-  width: 23.5vw;
-  height: 23.5vw;
+.momentPicOfMulti .momentPicContainer img {
+  width: 25vw;
+  height: 25vw;
+  padding-bottom: 0.35rem;
+  padding-right: 0.35rem;
+}
+
+.momentPicOfFour .momentPicContainer {
+  width: 80%;
+}
+
+.momentPicOfFour .momentPicContainer img {
+  width: 30vw;
+  height: 30vw;
+  padding-bottom: 0.35rem;
+  padding-right: 0.35rem;
+}
+
+.momentPicOfOne .momentPicContainer img {
+  max-height: 40vw;
+  padding-bottom: 0.35rem;
 }
 
 /* 点赞及工具栏样式 */
@@ -526,6 +641,22 @@ main {
 .momentTime {
   color: #717171;
   font-size: 0.5rem;
+}
+
+.ellipsisDiv {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 6vw;
+  height: 4vw;
+  background-color: #e8e8e8;
+  border-radius: 0.1rem;
+}
+
+.popDiv {
+  position: absolute;
+  left: -42vw;
 }
 
 .popCard ul {
@@ -575,17 +706,25 @@ main {
 }
 
 .commentItem {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
   font-size: 0.8rem;
   background-color: #f8f8f8;
-  padding: 0.3rem 0.4rem;
+  padding: 0rem 0.4rem;
+  overflow:hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 4;
 }
 
-.commentItem span {
+.commentItem p span {
   color: #5b6b8f;
   font-weight: bold;
 }
 
-.van-action-sheet__content {
+.actionSheet {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -593,16 +732,16 @@ main {
   height: 5vh;
 }
 
-.van-cell {
-  width: 70%;
+.commentInput {
+  width: 60%;
   padding: 3px 8px;
 }
 
-.van-icon-smile-o {
+.icon-icon_xiaolian-xian {
   font-size: 1.7rem;
 }
 
-.van-button--normal {
+.commentInputBtn {
   height: 70%;
   padding: 0 12px;
   background-color: #f7f7f7;

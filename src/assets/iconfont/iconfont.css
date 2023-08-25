@@ -1,6 +1,6 @@
 @font-face {
   font-family: "iconfont"; /* Project id  */
-  src: url('iconfont.ttf?t=1692796012387') format('truetype');
+  src: url('iconfont.ttf?t=1692890369837') format('truetype');
 }
 
 .iconfont {
@@ -27,11 +27,19 @@
   content: "\e63b";
 }
 
+.icon-icon_xiaolian-xian:before {
+  content: "\e650";
+}
+
 .icon-aixin:before {
   content: "\eca1";
 }
 
 .icon-pinglun:before {
   content: "\e602";
+}
+
+.icon-ellipsis:before {
+  content: "\e58a";
 }
 
