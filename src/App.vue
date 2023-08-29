@@ -1,6 +1,6 @@
 <template>
-  <div id="app" >
-    <div class="container" >
+  <div id="app">
+    <div class="container">
       <header>
         <div class="headContainer" ref="headerRef">
           <ul>
@@ -22,15 +22,15 @@
           </ul>
         </div>
       </header>
-      <main >
+      <main>
         <div class="refreshTip" v-show="isOnRefresh" ref="refreshTip">
         </div>
         <div class="scroll-container"
-          @touchstart.stop="handlerTouchStart"
-          @touchmove.stop="handlerTouchMove"
-          @touchend.stop="handlerTouchEnd"
-          ref="scrollContainer"
-          :class="{'transition': isTransition}"
+             @touchstart.stop="handlerTouchStart"
+             @touchmove.stop="handlerTouchMove"
+             @touchend.stop="handlerTouchEnd"
+             ref="scrollContainer"
+             :class="{'transition': isTransition}"
         >
           <div class="bgImage" :style="userProfile.bgImageUrl">
             <div class="userProfile">
@@ -45,59 +45,60 @@
           <div class="momentList">
             <div class="momentListContainer">
               <div class="momentItem" v-for="item in list" :key="item.id" :title="item">
-                  <div class="momentAvatar">
-                    <img :src="item.authorAvatarUrl" alt="动态作者头像">
+                <div class="momentAvatar">
+                  <img :src="item.authorAvatarUrl" alt="动态作者头像">
+                </div>
+                <div class="momentInfo">
+                  <div class="authorName">
+                    <span>{{ item.authorName }}</span>
                   </div>
-                  <div class="momentInfo">
-                    <div class="authorName">
-                      <span>{{ item.authorName }}</span>
+                  <div class="momentText">
+                    <p>{{ item.momentText }}</p>
+                  </div>
+                  <div class="momentPicOfOne" v-show="item.fileList.length === 1">
+                    <div class="momentPicContainer">
+                      <!--后续数据结构改变后，重新设置key值-->
+                      <img v-for="pic in item.fileList" :key="pic.id" :src="pic.url" alt="朋友圈配图">
                     </div>
-                    <div class="momentText">
-                      <p>{{ item.momentText }}</p>
+                  </div>
+                  <div class="momentPicOfFour" v-show="item.fileList.length === 4">
+                    <div class="momentPicContainer">
+                      <img v-for="pic in item.fileList" :key="pic.id" :src="pic.url" alt="朋友圈配图">
                     </div>
-                    <div class="momentPicOfOne" v-show="item.fileList.length === 1" >
-                      <div class="momentPicContainer">
-                        <!--后续数据结构改变后，重新设置key值-->
-                        <img v-for="pic in item.fileList" :key="pic.id" :src="pic.url" alt="朋友圈配图">
-                      </div>
+                  </div>
+                  <div class="momentPicOfMulti" v-show="item.fileList.length !== 4 && item.fileList.length !== 1">
+                    <div class="momentPicContainer">
+                      <img v-for="pic in item.fileList" :key="pic.id" :src="pic.url" alt="朋友圈配图">
                     </div>
-                    <div class="momentPicOfFour" v-show="item.fileList.length === 4">
-                      <div class="momentPicContainer">
-                        <img v-for="pic in item.fileList" :key="pic.id" :src="pic.url" alt="朋友圈配图">
-                      </div>
-                    </div>
-                    <div class="momentPicOfMulti" v-show="item.fileList.length !== 4 && item.fileList.length !== 1">
-                      <div class="momentPicContainer">
-                        <img v-for="pic in item.fileList" :key="pic.id" :src="pic.url" alt="朋友圈配图">
-                      </div>
-                    </div>
-                    <div class="likeCommentsTool">
-                      <div class="toolBars">
-                        <div class="momentTime"><span>3小时前</span></div>
-                        <div>
-                          <div class="ellipsisDiv" @click="handlerEllipseClick(item.id)">
-                            <i class="iconfont icon-ellipsis"></i>
-                            <div class="popDiv"
-                                 v-show="item.showPopover"
-                            >
-                              <div class="popCard">
-                                <ul>
-                                  <li>
-                                    <i class="iconfont icon-aixin" @click="handleLikeBtn($event,item.likeIt, item.id)" />
-                                    <span>赞</span>
-                                  </li>
-                                  <li @click="handleCommentBtn(item.id)">
-                                    <i class="iconfont icon-pinglun " />
-                                    <span>评论</span>
-                                  </li>
-                                </ul>
-                              </div>
+                  </div>
+                  <div class="likeCommentsTool">
+                    <div class="toolBars">
+                      <div class="momentTime"><span>3小时前</span></div>
+                      <div>
+                        <div class="ellipsisDiv" @click="handlerEllipseClick(item.id)">
+                          <i class="iconfont icon-ellipsis"></i>
+                          <div class="popDiv"
+                               v-show="item.showPopover"
+                          >
+                            <div class="popCard">
+                              <ul>
+                                <li>
+                                  <i class="iconfont icon-aixin" @click="handleLikeBtn($event,item.likeIt, item.id)"/>
+                                  <span>赞</span>
+                                </li>
+                                <li @click="handleCommentBtn(item.id)">
+                                  <i class="iconfont icon-pinglun "/>
+                                  <span>评论</span>
+                                </li>
+                              </ul>
                             </div>
                           </div>
                         </div>
                       </div>
+                    </div>
+                    <div class="userCallBackInfo" v-show="item.likeList.length > 0 || item.commentList.length > 0">
                       <div class="likeList" v-show="item.likeList.length > 0">
-                        <van-icon name="like-o"  />
+                        <van-icon name="like-o"/>
                         <ul>
                           <li v-for="likeItem in item.likeList" :key="likeItem.id" :title="likeItem">
                             <img :src="likeItem" alt="点赞人头像">
@@ -105,7 +106,8 @@
                         </ul>
                       </div>
                       <div class="commentsList" v-show="item.commentList.length > 0">
-                        <div class="commentItem" v-for="commentItem in item.commentList" :key="commentItem.id" :title="commentItem">
+                        <div class="commentItem" v-for="commentItem in item.commentList" :key="commentItem.id"
+                             :title="commentItem">
                           <p>
                             <span>{{ commentItem.name }}</span>
                             : {{ commentItem.commentText }}
@@ -114,14 +116,15 @@
                       </div>
                     </div>
                   </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
         <div class="actionSheet" v-show="showInputSheet">
-          <input class="commentInput" v-model="commentText" placeholder="评论"  />
-          <i class="iconfont icon-icon_xiaolian-xian" />
-          <button   class="commentInputBtn" @click="sendComment()">发送</button>
+          <input class="commentInput" v-model="commentText" placeholder="评论"/>
+          <i class="iconfont icon-icon_xiaolian-xian"/>
+          <button class="commentInputBtn" @click="sendComment()">发送</button>
         </div>
       </main>
     </div>
@@ -283,7 +286,7 @@ export default {
       loading: false,
       finished: false,
       // 点赞评论
-      actions: [{ text: '选项一' }, { text: '选项二' }, { text: '选项三' }],
+      actions: [{text: '选项一'}, {text: '选项二'}, {text: '选项三'}],
       // 输入评论的文本框
       showInputSheet: false,
       // 输入评论的内容
@@ -340,7 +343,7 @@ export default {
       // 浏览器窗口的高度
       let getWindowHeight = document.documentElement.clientHeight || document.body.clientHeight
       if (scrollTop > 300) {
-        this.$refs.headerRef.style.backgroundColor = `rgba(237, 237, 237,1)`
+        this.$refs.headerRef.style.backgroundColor = `rgba(237, 237, 237, 1)`
         // 改变字体颜色
         this.$refs.leftIcon.style.color = `#010101`
         this.$refs.rightIcon.style.color = `#010101`
@@ -456,6 +459,7 @@ body {
   display: flex;
   flex-direction: column;
 }
+
 /**
   header基础样式
  */
@@ -467,7 +471,7 @@ header {
 
 .headContainer {
   height: 6vh;
-  background-color:rgba(0,0,0,0);
+  background-color: rgba(0, 0, 0, 0);
   padding: 0 0.8rem;
 }
 
@@ -502,6 +506,7 @@ header {
   font-size: 1.3rem;
   color: #fff;
 }
+
 /**
   主体样式
  */
@@ -561,11 +566,12 @@ main {
   font-weight: bold;
 }
 
-.avatar img{
+.avatar img {
   height: 3.6rem;
   width: 3.6rem;
   border-radius: 0.5rem;
 }
+
 /**
   动态列表样式
  */
@@ -578,7 +584,7 @@ main {
   overflow: visible;
 }
 
-.momentAvatar img{
+.momentAvatar img {
   height: 2.4rem;
   width: 2.4rem;
   border-radius: 0.2rem;
@@ -587,9 +593,11 @@ main {
 .momentItem {
   display: flex;
   justify-content: space-between;
-  width: 90vw;
-  padding: 0.4rem 0;
+  width: 100vw;
+  padding-top: 0.6rem;
   border-bottom: 1px solid #e8e8e8;
+  padding-left: 1.3rem;
+  padding-right: 1.3rem;
 }
 
 .momentInfo {
@@ -610,11 +618,12 @@ main {
 .momentPicContainer {
   display: flex;
   flex-wrap: wrap;
+  width: 96%;
 }
 
 .momentPicOfMulti .momentPicContainer img {
-  width: 26vw;
-  height: 26vw;
+  width: 24.8vw;
+  height: 24.8vw;
   padding-bottom: 0.17rem;
   padding-right: 0.17rem;
 }
@@ -624,25 +633,32 @@ main {
 }
 
 .momentPicOfFour .momentPicContainer {
-  width: 80%;
 }
 
 .momentPicOfFour .momentPicContainer img {
-  width: 30vw;
-  height: 30vw;
-  padding-bottom: 0.35rem;
-  padding-right: 0.35rem;
+  width: 27vw;
+  height: 27vw;
+  padding-bottom: 0.17rem;
+  padding-right: 0.17rem;
 }
 
 .momentPicOfOne .momentPicContainer img {
-  max-height: 40vw;
+  max-height: 44vw;
   padding-bottom: 0.35rem;
 }
 
 /* 点赞及工具栏样式 */
+.likeCommentsTool {
+}
+
+.userCallBackInfo {
+  padding-bottom: 0.6rem;
+}
+
 .toolBars {
   display: flex;
   justify-content: space-between;
+  padding: 0.5rem 0;
 }
 
 .toolBars .van-icon {
@@ -729,9 +745,14 @@ main {
   font-size: 0.8rem;
   background-color: #f8f8f8;
   padding: 0rem 0.4rem;
-  overflow:hidden;
+  overflow: hidden;
   text-overflow: ellipsis;
   -webkit-line-clamp: 4;
+}
+
+.commentItem p {
+  padding: 0.2rem;
+  margin: 0;
 }
 
 .commentItem p span {
