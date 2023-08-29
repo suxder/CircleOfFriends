@@ -144,6 +144,8 @@ export default {
       distance: '',
       // 是否启动transition
       isTransition: false,
+      // 动态变动的transform
+      transformValue: '',
       // 记录是否开始刷新
       isOnRefresh: false,
       /**
@@ -309,9 +311,13 @@ export default {
       let rotateSpeed = 2
 
       this.moveDistance = Math.floor(e.touches[0].pageY - this.startLocation)
-      this.$refs.scrollContainer.style.transform = `translateY(${this.moveDistance * moveSpeed}px)`
-      this.$refs.refreshTip.style.transform = `rotate(-${this.moveDistance * rotateSpeed}deg)`
-      this.$refs.refreshTip.style.top = `3rem`
+
+      // 如果是下拉，则改变transformValue
+      if (this.moveDistance > 0) {
+        this.$refs.scrollContainer.style.transform = `translateY(${this.moveDistance * moveSpeed}px)`
+        this.$refs.refreshTip.style.transform = `rotate(-${this.moveDistance * rotateSpeed}deg)`
+        this.$refs.refreshTip.style.top = `3rem`
+      }
     },
     // 获取手指松开的Y轴位置
     handlerTouchEnd (e) {
@@ -350,9 +356,6 @@ export default {
         this.$refs.rightIcon.style.color = `#fff`
         this.$refs.appTitle.style.visibility = `hidden`
       }
-
-      // 滚动条距离页面顶部的距离大于一屏时触发该方法
-
       if (scrollTop + getWindowHeight === documentScrollHeight) {
         console.log('监听成功')
       }
@@ -537,12 +540,12 @@ main {
   background-size: cover;
   background-position: center;
   width: 100%;
-  height: 36vh;
+  height: 33vh;
 }
 
 .userProfile {
   display: flex;
-  width: 7rem;
+  width: 6.8rem;
   justify-content: space-between;
   align-items: center;
   position: absolute;
@@ -553,14 +556,14 @@ main {
 .userName {
   font-size: 0.9rem;
   align-self: flex-start;
-  padding: 1em 0;
+  padding: 0.5em 0;
   color: #ffffff;
   font-weight: bold;
 }
 
 .avatar img{
-  height: 4rem;
-  width: 4rem;
+  height: 3.6rem;
+  width: 3.6rem;
   border-radius: 0.5rem;
 }
 /**
@@ -569,15 +572,15 @@ main {
 .momentList {
   width: 100%;
   background-color: #ffffff;
-  padding-top: 3rem;
+  padding-top: 6.1rem;
   display: flex;
   justify-content: center;
   overflow: visible;
 }
 
 .momentAvatar img{
-  height: 2.5rem;
-  width: 2.5rem;
+  height: 2.4rem;
+  width: 2.4rem;
   border-radius: 0.2rem;
 }
 
@@ -610,10 +613,14 @@ main {
 }
 
 .momentPicOfMulti .momentPicContainer img {
-  width: 25vw;
-  height: 25vw;
-  padding-bottom: 0.35rem;
-  padding-right: 0.35rem;
+  width: 26vw;
+  height: 26vw;
+  padding-bottom: 0.17rem;
+  padding-right: 0.17rem;
+}
+
+.momentPicOfMulti .momentPicContainer img:nth-child(3n+3) {
+  padding-right: 0;
 }
 
 .momentPicOfFour .momentPicContainer {
