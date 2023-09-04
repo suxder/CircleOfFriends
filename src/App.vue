@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" @click="handleClickOutside">
     <div class="container">
       <header>
         <div class="headContainer" ref="headerRef">
@@ -75,7 +75,8 @@
                     <div class="toolBars">
                       <div class="momentTime"><span>3小时前</span></div>
                       <div>
-                        <div class="ellipsisDiv" @click="handlerEllipseClick(item.id)">
+                        <!-- 必须阻止事件冒泡，否则全局点击事件会失效-->
+                        <div class="ellipsisDiv" @click.stop="handlerEllipseClick(item.id)">
                           <i class="iconfont icon-ellipsis"></i>
                           <div class="popDiv"
                                v-show="item.showPopover"
@@ -83,8 +84,8 @@
                             <div class="popCard">
                               <ul>
                                 <li>
-                                  <i class="iconfont icon-aixin" @click="handleLikeBtn($event,item.likeIt, item.id)"/>
-                                  <span>赞</span>
+                                  <i :class="{'iconfont': isIconFont, 'icon-aixin': isAixin, 'icon-xiai': isXiAi, 'likeIconColor': isLikeColor, 'unlikeIconColor': !isLikeColor}" @click="handleLikeBtn($event,item.likeIt, item.id)"/>
+                                  <span>{{ likeIconInnerText }}</span>
                                 </li>
                                 <li @click="handleCommentBtn(item.id)">
                                   <i class="iconfont icon-pinglun "/>
@@ -285,6 +286,12 @@ export default {
       ],
       loading: false,
       finished: false,
+      isIconFont: true,
+      isAixin: true,
+      isXiAi: false,
+      isLikeColor: false,
+      likeIconInnerText: '赞',
+      showPopOverID: 0,
       // 点赞评论
       actions: [{text: '选项一'}, {text: '选项二'}, {text: '选项三'}],
       // 输入评论的文本框
@@ -369,16 +376,15 @@ export default {
     // 侦听ellipseDiv点击事件
     handlerEllipseClick (id) {
       this.list[id].showPopover = true
+      this.showPopOverID = id
     },
     //  点赞按钮回调函数
     handleLikeBtn (e, likeIt, id) {
       if (likeIt) {
-        console.log(e.target)
-        e.target.classList.remove('icon-xiai')
-        e.target.classList.add('icon-aixin')
-        e.target.classList.remove('likeIconColor')
-        e.target.classList.add('unlikeIconColor')
-        e.target.parentNode.children[1].innerText = '赞'
+        this.isXiAi = false
+        this.isAixin = true
+        this.isLikeColor = false
+        this.likeIconInnerText = '赞'
         this.list[id].likeIt = false
         this.list[id].likeList.shift()
         // 定时关闭popCard
@@ -388,11 +394,10 @@ export default {
         }, 300)
       } else {
         let data = require('../src/assets/image/avatar.jpg')
-        e.target.classList.remove('icon-aixin')
-        e.target.classList.add('icon-xiai')
-        e.target.classList.remove('unlikeIconColor')
-        e.target.classList.add('likeIconColor')
-        e.target.parentNode.children[1].innerText = '取消'
+        this.isXiAi = true
+        this.isAixin = false
+        this.isLikeColor = true
+        this.likeIconInnerText = '取消'
         this.list[id].likeIt = true
         this.list[id].likeList.push(data)
         // 定时关闭popCard
@@ -423,6 +428,11 @@ export default {
       this.list[this.commentID].commentList.push(itemComment)
       this.showInputSheet = false
       this.commentText = ''
+    },
+    //  全局点击事件监听器
+    handleClickOutside () {
+      console.log('事件maopao')
+      this.list[this.showPopOverID].showPopover = false
     }
   },
   mounted () {
