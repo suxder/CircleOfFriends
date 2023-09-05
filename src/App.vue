@@ -1,5 +1,5 @@
 <template>
-  <div id="app" @click="handleClickOutside">
+  <div id="app">
     <div class="container">
       <header>
         <div class="headContainer" ref="headerRef">
@@ -22,7 +22,7 @@
           </ul>
         </div>
       </header>
-      <main>
+      <main @click="handleClickOutside">
         <div class="refreshTip" v-show="isOnRefresh" ref="refreshTip">
         </div>
         <div class="scroll-container"
@@ -122,12 +122,13 @@
             </div>
           </div>
         </div>
-        <div class="actionSheet" v-show="showInputSheet">
-          <input class="commentInput" v-model="commentText" placeholder="评论"/>
-          <i class="iconfont icon-icon_xiaolian-xian"/>
-          <button class="commentInputBtn" @click="sendComment()">发送</button>
-        </div>
       </main>
+      <div class="actionSheet" v-show="showInputSheet">
+        <input @input="inputTyped" class="commentInput" v-model="commentText" placeholder="评论"/>
+        <i class="iconfont icon-icon_xiaolian-xian"/>
+        <!-- 必须阻止事件冒泡，否则全局点击事件会失效-->
+        <button class="commentInputBtn" @click.stop="sendComment()">发送</button>
+      </div>
     </div>
   </div>
 </template>
@@ -429,10 +430,14 @@ export default {
       this.showInputSheet = false
       this.commentText = ''
     },
-    //  全局点击事件监听器
+    //  main标签点击事件监听器
     handleClickOutside () {
-      console.log('事件maopao')
       this.list[this.showPopOverID].showPopover = false
+      this.showInputSheet = false
+    },
+    // 阻止input输入框事件冒泡
+    inputTyped (e) {
+      e.stopPropagation()
     }
   },
   mounted () {
@@ -447,6 +452,8 @@ export default {
 */
 :root {
   font-size: 1em;
+  font-family: source-han-sans-simplified-c, sans-serif;
+  font-style: normal;
 }
 
 * {
@@ -694,8 +701,14 @@ main {
   align-items: center;
   width: 6vw;
   height: 4vw;
-  background-color: #e8e8e8;
+  background-color: #f8f8f8;
+  color: #626ca7;
+  font-size: 1.5rem;
   border-radius: 0.1rem;
+}
+
+.ellipsisDiv .iconfont {
+  font-size: 14px;
 }
 
 .popDiv {
@@ -778,12 +791,15 @@ main {
   justify-content: space-evenly;
   align-items: center;
   background-color: #f7f7f7;
-  height: 5vh;
+  height: 6vh;
+  font-size: 0.9rem;
 }
 
 .commentInput {
-  width: 60%;
-  padding: 3px 8px;
+  width: 70%;
+  padding: 0.4rem 0.7rem;
+  border: none;
+  border-radius: 0.3rem;
 }
 
 .icon-icon_xiaolian-xian {
@@ -791,8 +807,8 @@ main {
 }
 
 .commentInputBtn {
-  height: 70%;
-  padding: 0 12px;
+  height: 60%;
+  padding: 0 0.8rem;
   background-color: #f7f7f7;
   border: 1px solid #c8c8c8;
   border-radius: 0.2rem;
