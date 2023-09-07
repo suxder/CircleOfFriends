@@ -58,17 +58,17 @@
                   <div class="momentPicOfOne" v-show="item.fileList.length === 1">
                     <div class="momentPicContainer">
                       <!--后续数据结构改变后，重新设置key值-->
-                      <img v-for="pic in item.fileList" :key="pic.id" :src="pic.url" alt="朋友圈配图">
+                      <img v-for="(pic, index) in item.fileList" :key="pic.id" :src="pic.url" @click="openPreviewImg(index, item.id)" alt="朋友圈配图">
                     </div>
                   </div>
                   <div class="momentPicOfFour" v-show="item.fileList.length === 4">
                     <div class="momentPicContainer">
-                      <img v-for="pic in item.fileList" :key="pic.id" :src="pic.url" alt="朋友圈配图">
+                      <img v-for="(pic, index) in item.fileList" :key="pic.id" :src="pic.url" @click="openPreviewImg(index, item.id)" alt="朋友圈配图">
                     </div>
                   </div>
                   <div class="momentPicOfMulti" v-show="item.fileList.length !== 4 && item.fileList.length !== 1">
                     <div class="momentPicContainer">
-                      <img v-for="pic in item.fileList" :key="pic.id" :src="pic.url" alt="朋友圈配图">
+                      <img v-for="(pic, index) in item.fileList" :key="pic.id" :src="pic.url" @click="openPreviewImg(index, item.id)" alt="朋友圈配图">
                     </div>
                   </div>
                   <div class="likeCommentsTool">
@@ -129,13 +129,21 @@
         <!-- 必须阻止事件冒泡，否则全局点击事件会失效-->
         <button class="commentInputBtn" @click.stop="sendComment()">发送</button>
       </div>
+      <PreviewImage
+        :visible.sync="previewImg.visible"
+        :currentIndex="previewImg.currentIndex"
+        :previewImgList="previewImg.imgUrlList"
+      />
     </div>
   </div>
 </template>
 
 <script>
+import PreviewImage from './components/PreviewImage/index.vue'
+
 export default {
   name: 'App',
+  components: { PreviewImage },
   data () {
     return {
       /**
@@ -275,6 +283,7 @@ export default {
           momentText: '好久没出门了',
           fileList: [
             {
+              id: 0,
               url: 'https://img01.yzcdn.cn/vant/tree.jpg'
             }
           ],
@@ -300,7 +309,13 @@ export default {
       // 输入评论的内容
       commentText: '',
       // 记录评论所属的动态ID
-      commentID: 0
+      commentID: 0,
+      // 暂存预览图列表
+      previewImg: {
+        visible: false,
+        currentIndex: -1,
+        imgUrlList: ['https://img01.yzcdn.cn/vant/tree.jpg']
+      }
     }
   },
   computed: {},
@@ -438,6 +453,12 @@ export default {
     // 阻止input输入框事件冒泡
     inputTyped (e) {
       e.stopPropagation()
+    },
+    // 打开预览图片遮罩层
+    openPreviewImg (index, id) {
+      this.previewImg.imgUrlList = this.list[id].fileList
+      this.previewImg.currentIndex = index
+      this.previewImg.visible = true
     }
   },
   mounted () {
@@ -452,8 +473,6 @@ export default {
 */
 :root {
   font-size: 1em;
-  font-family: source-han-sans-simplified-c, sans-serif;
-  font-style: normal;
 }
 
 * {
@@ -466,7 +485,8 @@ body {
 }
 
 #app {
-  font-family: "Microsoft Yahei";
+  font-family: "Songti SC", "Songti TC", "Microsoft YaHei", "微软雅黑", sans-serif;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 100vh;
@@ -699,12 +719,12 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 6vw;
-  height: 4vw;
+  width: 8vw;
+  height: 5vw;
   background-color: #f8f8f8;
   color: #626ca7;
   font-size: 1.5rem;
-  border-radius: 0.1rem;
+  border-radius: 0.2rem;
 }
 
 .ellipsisDiv .iconfont {
@@ -713,21 +733,22 @@ main {
 
 .popDiv {
   position: absolute;
-  left: -42vw;
+  left: -46vw;
 }
 
 .popCard ul {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-around;
   align-items: center;
-  width: 40vw;
-  height: 4vh;
+  width: 45vw;
+  height: 4.5vh;
   background-color: #4c4c4c;
+  border-radius: 0.3rem;
 }
 
 .popCard ul li {
   color: #fbfbfb;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 .likeList {
