@@ -84,8 +84,8 @@
                             <div class="popCard">
                               <ul>
                                 <li>
-                                  <i :class="{'iconfont': isIconFont, 'icon-aixin': isAixin, 'icon-xiai': isXiAi, 'likeIconColor': isLikeColor, 'unlikeIconColor': !isLikeColor}" @click="handleLikeBtn($event,item.likeIt, item.id)"/>
-                                  <span>{{ likeIconInnerText }}</span>
+                                  <i :class="{'iconfont': isIconFont, 'icon-aixin': !item.likeIt, 'icon-xiai': item.likeIt, 'likeIconColor': item.likeIt, 'unlikeIconColor': !item.likeIt}" @click="handleLikeBtn($event,item.likeIt, item.id)"/>
+                                  <span>{{ item.likeIt ? "取消" : "赞"}}</span>
                                 </li>
                                 <li @click="handleCommentBtn(item.id)">
                                   <i class="iconfont icon-pinglun "/>
@@ -397,10 +397,6 @@ export default {
     //  点赞按钮回调函数
     handleLikeBtn (e, likeIt, id) {
       if (likeIt) {
-        this.isXiAi = false
-        this.isAixin = true
-        this.isLikeColor = false
-        this.likeIconInnerText = '赞'
         this.list[id].likeIt = false
         this.list[id].likeList.shift()
         // 定时关闭popCard
@@ -410,10 +406,6 @@ export default {
         }, 300)
       } else {
         let data = require('../src/assets/image/avatar.jpg')
-        this.isXiAi = true
-        this.isAixin = false
-        this.isLikeColor = true
-        this.likeIconInnerText = '取消'
         this.list[id].likeIt = true
         this.list[id].likeList.push(data)
         // 定时关闭popCard
